@@ -36,3 +36,34 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+// Local Development
+dockerCompose {
+    useComposeFiles = ["${rootDir}/docker/docker-compose.yml"]
+}
+
+task bootRunLocal(group: 'Application', type: org.springframework.boot.gradle.tasks.run.BootRun) {
+    dependsOn('composeUp')
+    description('Runs the application and database locally.')
+    mainClass.set("com.hendisantika.redisexample.SpringWebfluxRedisExampleApplication")
+    classpath = sourceSets.main.runtimeClasspath
+    jvmArgs = ['-Dspring.profiles.active=local']
+}
+
+task bootRunLocalDebug(group: 'SpringWebfluxRedisExampleApplication', type: org.springframework.boot.gradle.tasks.run.BootRun) {
+    dependsOn('composeUp')
+    description('Runs the application (with debugger) and database locally.')
+    mainClass.set("com.hendisantika.redisexample.SpringWebfluxRedisExampleApplication")
+    classpath = sourceSets.main.runtimeClasspath
+    jvmArgs = ['-Dspring.profiles.active=local', '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005']
+}
+
+task startRedis(group: 'Database') {
+    dependsOn('composeUp')
+    description('Starts the local Redis database.')
+}
+
+task stopRedis(group: 'Database') {
+    dependsOn('composeDownForced')
+    description('Stops the local Redis database.')
+}
