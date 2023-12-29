@@ -9,6 +9,9 @@ import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+
 /**
  * Created by IntelliJ IDEA.
  * Project : redis-example
@@ -38,5 +41,23 @@ public class ProductLoader {
                 .doOnSubscribe(subscription -> log.info("Loading test data..."))
                 .doOnComplete(() -> log.info("Test data load complete!"))
                 .subscribe();
+    }
+
+    /**
+     * Generates a random product for testing.
+     *
+     * @param id product identifier
+     * @return a {@link Product}
+     */
+    private Product generateProduct(final int id) {
+        final Product product = new Product();
+        product.setId(String.valueOf(id));
+        product.setName("Product" + id);
+        product.setDescription("Product" + id + " Description");
+        product.setActive(id % 2 == 1);
+        product.setStartTime(OffsetDateTime.of(2021, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).toEpochSecond());
+        product.setEndTime(OffsetDateTime.of(2021, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).plusDays(30).toEpochSecond());
+
+        return product;
     }
 }
