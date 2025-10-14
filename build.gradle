@@ -39,7 +39,7 @@ tasks.named('test') {
 
 // Local Development
 dockerCompose {
-    useComposeFiles = ["${rootDir}/docker/docker-compose.yml"]
+    useComposeFiles = ["${rootDir}/docker-compose.yml"]
 }
 
 task bootRunLocal(group: 'Application', type: org.springframework.boot.gradle.tasks.run.BootRun) {
