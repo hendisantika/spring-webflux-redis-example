@@ -20,6 +20,18 @@ jobs:
     permissions:
       contents: read
 
+    # Redis is required by the @SpringBootTest context (ProductLoader connects on startup)
+    services:
+      redis:
+        image: redis:8-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
     - uses: actions/checkout@v7
     - name: Set up JDK 25

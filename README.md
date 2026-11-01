@@ -272,7 +272,7 @@ export JAVA_HOME=/path/to/jdk-25
 GitHub Actions workflow [`.github/workflows/gradle.yml`](.github/workflows/gradle.yml) runs on every push and pull
 request to `main`:
 
-- **build** – sets up Temurin JDK 25 and runs `./gradlew build` (compile + tests)
+- **build** – starts a Redis 8 service container, sets up Temurin JDK 25 and runs `./gradlew build` (compile + tests)
 - **dependency-submission** – submits the Gradle dependency graph so Dependabot alerts cover all dependencies
 
 ## Dependency Updates (Dependabot)
