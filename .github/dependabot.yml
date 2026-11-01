@@ -1,13 +1,82 @@
 version: 2
 updates:
-  - package-ecosystem: gradle
+  # Gradle dependencies (build.gradle, plugins & Gradle wrapper)
+  - package-ecosystem: "gradle"
     directory: "/"
     schedule:
-      interval: daily
-      time: '05:00'
-      timezone: Asia/Jakarta
+      interval: "daily"
+      time: "05:00"
+      timezone: "Asia/Jakarta"
     open-pull-requests-limit: 10
+    target-branch: "main"
+    assignees:
+      - "hendisantika"
+    labels:
+      - "dependencies"
+      - "java"
+    commit-message:
+      prefix: "build(deps)"
+      prefix-development: "build(deps-dev)"
+      include: "scope"
+    groups:
+      spring-boot:
+        patterns:
+          - "org.springframework.boot*"
+          - "io.spring.dependency-management*"
+        update-types:
+          - "minor"
+          - "patch"
+      gradle-plugins:
+        patterns:
+          - "com.avast.gradle*"
+      test-dependencies:
+        patterns:
+          - "*junit*"
+          - "*mockito*"
+          - "*assertj*"
+          - "io.projectreactor:reactor-test"
+      lombok:
+        patterns:
+          - "org.projectlombok*"
+
+  # GitHub Actions used in workflows
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
+      time: "05:00"
+      timezone: "Asia/Jakarta"
+    open-pull-requests-limit: 10
+    assignees:
+      - "hendisantika"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci(deps)"
+      include: "scope"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Docker images referenced in docker-compose.yml (Redis)
+  - package-ecosystem: "docker-compose"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "Asia/Jakarta"
+    open-pull-requests-limit: 5
+    assignees:
+      - "hendisantika"
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
