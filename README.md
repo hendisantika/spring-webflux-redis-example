@@ -1,17 +1,23 @@
 # Spring WebFlux Redis Example
 
-A reactive REST API example using Spring Boot 3, Spring WebFlux, and Redis. This project demonstrates how to build a
+[![Java CI with Gradle](https://github.com/hendisantika/spring-webflux-redis-example/actions/workflows/gradle.yml/badge.svg)](https://github.com/hendisantika/spring-webflux-redis-example/actions/workflows/gradle.yml)
+![Java](https://img.shields.io/badge/Java-25-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.2-brightgreen)
+![Gradle](https://img.shields.io/badge/Gradle-9.8.2-02303A)
+
+A reactive REST API example using Spring Boot 4, Spring WebFlux, and Redis. This project demonstrates how to build a
 non-blocking, reactive application with Redis as a data store.
 
 ## Technologies Used
 
-- **Java 21** - Programming language
-- **Spring Boot 3.5.6** - Application framework
+- **Java 25** - Programming language (via Gradle Java toolchain)
+- **Spring Boot 4.1.2** - Application framework
 - **Spring WebFlux** - Reactive web framework
 - **Spring Data Redis Reactive** - Reactive Redis integration
 - **Redis** - In-memory data store
+- **Jackson 3** - JSON serialization (`JacksonJsonRedisSerializer`)
 - **Lombok** - Reduce boilerplate code
-- **Gradle 8.12** - Build tool
+- **Gradle 9.8.2** - Build tool
 - **Docker Compose** - Container orchestration for local development
 
 ## Features
@@ -24,9 +30,9 @@ non-blocking, reactive application with Redis as a data store.
 
 ## Prerequisites
 
-- Java 21 or higher
+- JDK 25
 - Docker (for running Redis via Docker Compose)
-- Gradle 8.12 or higher (wrapper included)
+- Gradle 9.8.2 (wrapper included, no local install needed)
 
 ## Project Structure
 
@@ -59,11 +65,18 @@ cd spring-webflux-redis-example
 
 ### 2. Configure Java Version (if needed)
 
-If you have multiple Java versions installed, create a `gradle.properties` file:
+The build uses a [Gradle Java toolchain](https://docs.gradle.org/current/userguide/toolchains.html) pinned to
+**JDK 25**, so Gradle will pick up an installed JDK 25 automatically. If you have multiple JDKs, point `JAVA_HOME`
+to JDK 25:
 
-```properties
-org.gradle.java.home=/path/to/java21
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 25)   # macOS
+# or with SDKMAN
+sdk use java 25-tem
 ```
+
+> Do **not** commit `org.gradle.java.home` to `gradle.properties` – a machine-specific path breaks the CI build.
+> Put it in `~/.gradle/gradle.properties` instead if you need it.
 
 ### 3. Build the project
 
@@ -193,12 +206,12 @@ This application uses Project Reactor for reactive programming:
 The application uses `ReactiveRedisTemplate` with:
 
 - String keys
-- Jackson JSON serialization for Product objects
+- Jackson 3 JSON serialization (`JacksonJsonRedisSerializer`) for Product objects
 - Reactive operations (non-blocking)
 
 ### Key Components
 
-1. **RedisConfiguration** - Configures ReactiveRedisOperations with JSON serialization
+1. **RedisConfiguration** - Configures ReactiveRedisOperations with Jackson 3 JSON serialization
 2. **ProductLoader** - Uses `@PostConstruct` to load test data on startup
 3. **ProductRepository** - Provides reactive Redis operations
 4. **ProductService** - Business logic layer
@@ -244,15 +257,35 @@ server.port=8081
 
 ### Build fails with "Unsupported class file major version"
 
-Ensure you're using Java 21:
+Ensure you're using JDK 25:
 
 ```bash
 java -version
-# Should show Java 21
+# Should show Java 25
 
-# Set JAVA_HOME or create gradle.properties with correct Java path
-echo "org.gradle.java.home=/path/to/java21" > gradle.properties
+# Point JAVA_HOME to JDK 25 (or set org.gradle.java.home in ~/.gradle/gradle.properties)
+export JAVA_HOME=/path/to/jdk-25
 ```
+
+## Continuous Integration
+
+GitHub Actions workflow [`.github/workflows/gradle.yml`](.github/workflows/gradle.yml) runs on every push and pull
+request to `main`:
+
+- **build** – sets up Temurin JDK 25 and runs `./gradlew build` (compile + tests)
+- **dependency-submission** – submits the Gradle dependency graph so Dependabot alerts cover all dependencies
+
+## Dependency Updates (Dependabot)
+
+[`.github/dependabot.yml`](.github/dependabot.yml) keeps dependencies up to date:
+
+| Ecosystem      | Schedule                    | Grouping                                                      | Commit prefix   |
+|----------------|-----------------------------|---------------------------------------------------------------|-----------------|
+| Gradle         | daily 05:00 Asia/Jakarta    | `spring-boot`, `gradle-plugins`, `test-dependencies`, `lombok` | `build(deps)`   |
+| GitHub Actions | daily 05:00 Asia/Jakarta    | all minor/patch updates in one PR                             | `ci(deps)`      |
+| Docker Compose | weekly (Monday) 05:00       | –                                                             | `chore(deps)`   |
+
+PRs are labeled (`dependencies` + ecosystem label) and assigned to the maintainer.
 
 ## Author
 
